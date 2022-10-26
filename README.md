@@ -1,9 +1,8 @@
-<h1>wb</h1>  
+<h1>🪄 wb</h1>  
 <p> A wizard who goes back and brings old files!</p>  
 <p>  
   <a href="https://opensource.org/licenses/MIT">  
     <img src="https://img.shields.io/badge/license-MIT-_red.svg">  
-  </a>  
   <a href="https://goreportcard.com/badge/github.com/riza/wb">  
     <img src="https://goreportcard.com/badge/github.com/riza/wb">  
   </a>  

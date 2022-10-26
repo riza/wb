@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
@@ -31,7 +32,7 @@ func main() {
 		}
 
 		if err := sc.Err(); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to read input: %s\n", err)
+			log.Errorf("failed to read input: %s\n", err)
 		}
 	}
 
@@ -41,28 +42,16 @@ func main() {
 
 	snapshots, err := getSnapshots(client, url)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to getting snapshots  %s\n", err)
+		log.Errorf("failed to snapshots: %s\n", err)
 	}
 
 	lastSnapshot := snapshots[len(snapshots)-1]
-	lastSnapshotTs := lastSnapshot[0]
-	lastSnapshotURL := lastSnapshot[1]
-
-	request, err := http.NewRequest("GET", fmt.Sprintf(wbFileURL, lastSnapshotTs, lastSnapshotURL), nil)
+	snapshotContent, err := getSnapshotContent(client, lastSnapshot[0], lastSnapshot[1])
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to generate request waybackmachine api: %s\n", err)
+		log.Fatalf("failed to read input: %s\n", err)
 	}
 
-	request.Header.Add("Accept-Encoding", "plain")
-
-	response, err := client.Do(request)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to send request waybackmachine api: %s\n", err)
-	}
-
-	defer response.Body.Close()
-
-	io.Copy(os.Stdout, response.Body)
+	io.Copy(os.Stdout, snapshotContent)
 }
 
 func getSnapshots(c http.Client, url string) ([][]string, error) {
@@ -90,4 +79,21 @@ func getSnapshots(c http.Client, url string) ([][]string, error) {
 	}
 
 	return r[1:], nil
+}
+
+func getSnapshotContent(c http.Client, ts, url string) (io.ReadCloser, error) {
+	request, err := http.NewRequest("GET", fmt.Sprintf(wbFileURL, ts, url), nil)
+	if err != nil {
+		return nil, fmt.Errorf("getSnapshotContent: failed to generate request waybackmachine api: %w", err)
+	}
+
+	request.Header.Add("Accept-Encoding", "plain")
+
+	response, err := c.Do(request)
+	if err != nil {
+		return nil, fmt.Errorf("getSnapshotContent: failed to send request waybackmachine api: %w", err)
+	}
+	defer response.Body.Close()
+
+	return response.Body, nil
 }
