@@ -55,19 +55,19 @@ func main() {
 }
 
 func getSnapshots(c http.Client, url string) ([][]string, error) {
-	request, err := http.NewRequest("GET", fmt.Sprintf(wbSnapshotApiURL, url), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(wbSnapshotApiURL, url), nil)
 	if err != nil {
 		return [][]string{}, fmt.Errorf("getSnapshots: failed to generate request waybackmachine api: %w", err)
 	}
 
-	response, err := c.Do(request)
+	rsp, err := c.Do(req)
 	if err != nil {
 		return [][]string{}, fmt.Errorf("getSnapshots: failed to send request waybackmachine api: %w", err)
 	}
-	defer response.Body.Close()
+	defer rsp.Body.Close()
 
 	var r [][]string
-	dec := json.NewDecoder(response.Body)
+	dec := json.NewDecoder(rsp.Body)
 
 	err = dec.Decode(&r)
 	if err != nil {
@@ -82,18 +82,17 @@ func getSnapshots(c http.Client, url string) ([][]string, error) {
 }
 
 func getSnapshotContent(c http.Client, ts, url string) (io.ReadCloser, error) {
-	request, err := http.NewRequest("GET", fmt.Sprintf(wbFileURL, ts, url), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(wbFileURL, ts, url), nil)
 	if err != nil {
 		return nil, fmt.Errorf("getSnapshotContent: failed to generate request waybackmachine api: %w", err)
 	}
+	req.Header.Add("Accept-Encoding", "plain")
 
-	request.Header.Add("Accept-Encoding", "plain")
-
-	response, err := c.Do(request)
+	rsp, err := c.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("getSnapshotContent: failed to send request waybackmachine api: %w", err)
 	}
-	defer response.Body.Close()
+	defer rsp.Body.Close()
 
-	return response.Body, nil
+	return rsp.Body, nil
 }
