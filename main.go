@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -57,12 +56,12 @@ func main() {
 func getSnapshots(c http.Client, url string) ([][]string, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf(wbSnapshotApiURL, url), nil)
 	if err != nil {
-		return [][]string{}, fmt.Errorf("getSnapshots: failed to generate request waybackmachine api: %w", err)
+		return [][]string{}, fmt.Errorf("getSnapshots: failed to generate request waybackmachine api: %w url: %s", err, url)
 	}
 
 	rsp, err := c.Do(req)
 	if err != nil {
-		return [][]string{}, fmt.Errorf("getSnapshots: failed to send request waybackmachine api: %w", err)
+		return [][]string{}, fmt.Errorf("getSnapshots: failed to send request waybackmachine api: %w url: %s", err, url)
 	}
 	defer rsp.Body.Close()
 
@@ -71,11 +70,11 @@ func getSnapshots(c http.Client, url string) ([][]string, error) {
 
 	err = dec.Decode(&r)
 	if err != nil {
-		return [][]string{}, fmt.Errorf("getSnapshots: error while decoding response %w", err)
+		return [][]string{}, fmt.Errorf("getSnapshots: error while decoding response %w url: %s", err, url)
 	}
 
 	if len(r) < 1 {
-		return [][]string{}, errors.New("getSnapshots: no results found for this url")
+		return [][]string{}, fmt.Errorf("getSnapshots: no results found for this url: %s", url)
 	}
 
 	return r[1:], nil
@@ -84,15 +83,14 @@ func getSnapshots(c http.Client, url string) ([][]string, error) {
 func getSnapshotContent(c http.Client, ts, url string) (io.ReadCloser, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf(wbFileURL, ts, url), nil)
 	if err != nil {
-		return nil, fmt.Errorf("getSnapshotContent: failed to generate request waybackmachine api: %w", err)
+		return nil, fmt.Errorf("getSnapshotContent: failed to generate request waybackmachine api: %w url: %s", err, url)
 	}
 	req.Header.Add("Accept-Encoding", "plain")
 
 	rsp, err := c.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("getSnapshotContent: failed to send request waybackmachine api: %w", err)
+		return nil, fmt.Errorf("getSnapshotContent: failed to send request waybackmachine api: %w url: %s", err, url)
 	}
-	defer rsp.Body.Close()
 
 	return rsp.Body, nil
 }
