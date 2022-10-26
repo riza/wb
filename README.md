@@ -26,7 +26,10 @@ go install github.com/riza/wb@latest
 # Usage
 
 ```sh
-echo "https://akamai.airbnb.com/robots.txt"|wb
+echo "https://akamai.airbnb.com/robots.txt"|wb 
+```
+```sh
+wb https://akamai.airbnb.com/robots.txt
 ```
 
 # TODOs
