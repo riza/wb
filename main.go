@@ -32,7 +32,7 @@ func main() {
 		}
 
 		if err := sc.Err(); err != nil {
-			log.Errorf("failed to read input: %s\n", err)
+			log.Fatalf("failed to read input: %s\n", err)
 		}
 	}
 
@@ -42,7 +42,7 @@ func main() {
 
 	snapshots, err := getSnapshots(client, url)
 	if err != nil {
-		log.Errorf("failed to snapshots: %s\n", err)
+		log.Fatalf("failed to snapshots: %s\n", err)
 	}
 
 	lastSnapshot := snapshots[len(snapshots)-1]
