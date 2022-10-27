@@ -1,5 +1,5 @@
 <h1>🪄 wb</h1>  
-<p> A wizard who goes back and brings old files!</p>  
+<p> A wizard that brings old files!</p>  
 <p>  
   <a href="https://opensource.org/licenses/MIT">  
     <img src="https://img.shields.io/badge/license-MIT-_red.svg">  
@@ -16,7 +16,7 @@
 
 # Installation
 
-linx requires **go1.17** to install successfully. Run the following command to get the repo -
+wb requires **go1.17** to install successfully. Run the following command to get the repo -
 
 ```sh
 go install github.com/riza/wb@latest
